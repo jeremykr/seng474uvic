@@ -1,0 +1,5 @@
+RemaxScrape/.vscode
+RemaxScrape/node_modules
+RemaxScrape/*.js
+RemaxScrape/*.js.map
+RemaxScrape/package-lock.json
