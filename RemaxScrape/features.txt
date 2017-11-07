@@ -1,0 +1,14 @@
+price = label
+
+age (average home age in area)
+buildingType
+bedrooms
+bathrooms
+landSize
+space (square footage)
+ageofBuilding
+rooms
+
+TO ADD:
+walkscore
+transitscore
