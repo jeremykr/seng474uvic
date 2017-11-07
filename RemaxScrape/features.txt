@@ -11,4 +11,3 @@ rooms
 
 TO ADD:
 walkscore
-transitscore
