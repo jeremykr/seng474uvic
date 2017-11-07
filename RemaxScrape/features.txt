@@ -1,6 +1,6 @@
 price = label
 
-age (average home age in area)
+
 buildingType
 bedrooms
 bathrooms
@@ -8,6 +8,8 @@ landSize
 space (square footage)
 ageofBuilding
 rooms
+Average Home Price in Uplands
+age (average home age in area)
 
 TO ADD:
 walkscore
