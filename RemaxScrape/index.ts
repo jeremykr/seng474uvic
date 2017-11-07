@@ -59,7 +59,6 @@ async function parseListing(url: string) {
     const averageLocalPrice = demographicField.find('.value-item.currency > span').text().trim().replace(/[\s\n]+/g, '');
     const averageLocalAge = demographicField.find('.value-item.years > .value').text();
 
-
     const data = {
       success: true,
       url: url,
@@ -67,13 +66,13 @@ async function parseListing(url: string) {
       address: {
         street: address[0],
         cityState: address[1],
-        postal: address[2].replace(/\s+/g, '')
+        postal: address[2] ? address[2].replace(/\s+/g, '') : null
       },
-      price: parseInt(dataField.text().trim().replace(/[,\$]/g, '')),
-      average: {
-        price: averageLocalPrice,
-        age: averageLocalAge
-      }
+      price: parseFloat(dataField.text().trim().replace(/[,\$]/g, '')),
+      averageLocalPrice: averageLocalPrice,
+      averageLocalAge: averageLocalAge,
+      walkScore: parseInt($('a.walkscore-value').text()),
+      transitScore: parseInt($('a.transitscore-value').text())
     };
     
     const componentsField = dataField.find('.propertyDetailsComponents');
@@ -87,8 +86,11 @@ async function parseListing(url: string) {
 
     return data;
   } catch(e) {
-    return { success: false, url: url, error: e };
+    return { success: false, url: url, error: e.stack };
   }
 }
 
-parseListings('remaxDataset.json', JSON.parse(fs.readFileSync('urlData.json', 'utf8')));
+writeAllUrls('urlData2.json').then( () => {
+  parseListings('remaxDataset2.json', JSON.parse(fs.readFileSync('urlData2.json', 'utf8')));
+});
+
