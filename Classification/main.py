@@ -13,7 +13,7 @@ def check_feature_exists(feature, entry):
     return False
 
 def main():
-    with open('remaxDataset.json') as data_file:
+    with open('../RemaxScrape/remaxDataset.json') as data_file:
         data = json.load(data_file)
         current_house = House()
         house_list = []
