@@ -1,5 +1,4 @@
 import json
-from pprint import pprint
 from House import House
 
 def check_nested_feature_exists(average, age, house):
@@ -13,10 +12,15 @@ def check_feature_exists(feature, entry):
     return False
 
 def main():
-    with open('../RemaxScrape/remaxDataset.json') as data_file:
+
+
+    with open('../RemaxScrape/remaxDataset2.json') as data_file:
         data = json.load(data_file)
         current_house = House()
         house_list = []
+
+        building_type_list = []
+
         for house in data:
             current_house = House()
             if not check_feature_exists('price', house):
@@ -47,21 +51,33 @@ def main():
                 continue #skip iteration
             current_house.building_age = house['ageofBuilding']
 
-            if not check_feature_exists('rooms', house):
-                continue #skip iteration
-            if house['rooms'] == 0:
-                continue #skip iteration
-            current_house.rooms = house['rooms']
+            # if not check_feature_exists('rooms', house):
+            #     continue #skip iteration
+            # if house['rooms'] == 0:
+            #     continue #skip iteration
+            # current_house.rooms = house['rooms']
 
-            if not check_nested_feature_exists('average', 'age', house):
+            if not check_feature_exists('buildingType', house):
+                continue
+            mapping = current_house.dict[house['buildingType']]
+            current_house.building_type = mapping
+
+            #building_type_list.append(current_house['buildingType'])
+
+            #print house['walkScore']
+
+            if not check_feature_exists('walkScore', house) or house['walkScore'] == None:
+                continue
+            current_house.walk_score = house['walkScore']
+
+            if not check_feature_exists('averageLocalAge', house):
                 continue #skip iteration
-            current_house.average_age_area = house['average']['age']
+            current_house.average_age_area = house['averageLocalAge']
 
             house_list.append(current_house)
 
+
         print "Total house objects:", len(house_list)
-
-
 
 if __name__ == "__main__":
     main()
