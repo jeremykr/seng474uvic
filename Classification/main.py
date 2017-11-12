@@ -1,8 +1,8 @@
 import json
 from House import House
 
-def check_nested_feature_exists(average, age, house):
-    if house[average][age] != "":
+def check_nested_feature_exists(block, index, house):
+    if house[block][index] != "":
         return True
     return False
 
@@ -19,7 +19,7 @@ def main():
         current_house = House()
         house_list = []
 
-        building_type_list = []
+        prefix_list = []
 
         for house in data:
             current_house = House()
@@ -51,20 +51,10 @@ def main():
                 continue #skip iteration
             current_house.building_age = house['ageofBuilding']
 
-            # if not check_feature_exists('rooms', house):
-            #     continue #skip iteration
-            # if house['rooms'] == 0:
-            #     continue #skip iteration
-            # current_house.rooms = house['rooms']
-
             if not check_feature_exists('buildingType', house):
                 continue
             mapping = current_house.dict[house['buildingType']]
             current_house.building_type = mapping
-
-            #building_type_list.append(current_house['buildingType'])
-
-            #print house['walkScore']
 
             if not check_feature_exists('walkScore', house) or house['walkScore'] == None:
                 continue
@@ -74,10 +64,16 @@ def main():
                 continue #skip iteration
             current_house.average_age_area = house['averageLocalAge']
 
+            if not check_nested_feature_exists('address', 'postal', house):
+                continue
+            current_house.postal_code_prefix = house['address']['postal'][0:3]
+            mapping = current_house.postal_code_prefix_dict[house['address']['postal'][0:3]]
+            current_house.postal_code_prefix_mapping = mapping
+
             house_list.append(current_house)
 
-
         print "Total house objects:", len(house_list)
+
 
 if __name__ == "__main__":
     main()
