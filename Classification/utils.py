@@ -73,7 +73,6 @@ class Utils:
 
                 house_list.append(current_house)
 
-            print("Listings found: " + str(len(house_list)))
             return house_list
 
     # Returns len(L)*num_feat numpy matrix and len(L) class matrix
