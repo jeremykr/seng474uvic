@@ -59,9 +59,11 @@ class Utils:
                     continue
                 current_house.walk_score = house['walkScore']
 
+                '''
                 if not check_feature_exists('averageLocalAge', house):
                     continue #skip iteration
                 current_house.average_age_area = house['averageLocalAge']
+                '''
 
                 if not check_nested_feature_exists('address', 'postal', house):
                     continue
@@ -71,6 +73,7 @@ class Utils:
 
                 house_list.append(current_house)
 
+            print("Listings found: " + str(len(house_list)))
             return house_list
 
     # Returns len(L)*num_feat numpy matrix and len(L) class matrix
@@ -90,8 +93,8 @@ class Utils:
             X[i][2] = h.land_size
             X[i][3] = h.square_footage
             X[i][4] = h.building_age
-            X[i][5] = h.average_age_area
-            X[i][6] = h.walk_score
-            X[i][7] = h.building_type
-            X[i][8] = h.postal_code_prefix_mapping
+            #X[i][5] = h.average_age_area
+            X[i][5] = h.walk_score
+            X[i][6] = h.building_type
+            X[i][7] = h.postal_code_prefix_mapping
         return X, y
