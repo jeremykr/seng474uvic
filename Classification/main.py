@@ -1,67 +1,95 @@
-import json
-from pprint import pprint
-from House import House
+import numpy as np
+from utils import Utils
+from sklearn.model_selection import KFold
+from sklearn.metrics import mean_absolute_error
+from sklearn import svm
+from sklearn import preprocessing
+from sklearn.linear_model import BayesianRidge, LogisticRegression, SGDRegressor, Perceptron, PassiveAggressiveRegressor, RANSACRegressor, TheilSenRegressor
 
-def check_nested_feature_exists(average, age, house):
-    if house[average][age] != "":
-        return True
-    return False
+# Train and test using the given classifier with k-fold cross-validation
+def classify(X, y, k, clf):
+	# Split data into folds
+	kf = KFold(n_splits=k, shuffle=True)
+	splits = kf.split(X)
+	
+	abs_err = 0
+	per_err = 0
+	count = 0
 
-def check_feature_exists(feature, entry):
-    if feature in entry:
-        return True
-    return False
+	for train_index, test_index in splits:
+		X_train, X_test = X[train_index], X[test_index]
+		y_train, y_test = y[train_index], y[test_index]
+		clf.fit(X_train, y_train)
+		y_pred = clf.predict(X_test)
+
+		abs_err += mean_absolute_error(y_test, y_pred)
+		per_err += np.mean(np.abs((y_test - y_pred) / y_test) * 100)
+
+	#Some statistics
+	for i in range(len(y_pred)):
+		if np.mean(np.abs((y_test[i]-y_pred[i]))/y_test[i])*100 >= 20:
+			'''print("True price: " + str(round(y_test[i], 2)) + 
+					 "\nEst. price: " + str(round(y_pred[i], 2)) +
+					 "\nAbsolute error: " + str(round(np.abs(y_test[i]-y_pred[i]), 2)) +
+					 "\nPercentage error: " + str(round(np.mean(np.abs((y_test[i]-y_pred[i]))/y_test[i])*100, 2)) +
+					 "\nBuilding type: " + str(round(X_test[i][6], 2)) + "\n")
+			'''
+			count += 1
+
+	print("===========================================================")
+	print("Number of  properties with >= 20% error: " + str(count))
+	print("Mean absolute percentage error: " + str(round(per_err/k, 2)))
+	print("Mean absolute error: " + str(round(abs_err/k, 2)))
+	print("")
 
 def main():
-    with open('../RemaxScrape/remaxDataset.json') as data_file:
-        data = json.load(data_file)
-        current_house = House()
-        house_list = []
-        for house in data:
-            current_house = House()
-            if not check_feature_exists('price', house):
-                continue #skip iteration
-            current_house.price = house['price']
+	houses = Utils.get_house_data('../RemaxScrape/remaxDataset2.json')
+	print("Total listings: " + str(len(houses)) + "\n")
+	X, y = Utils.create_matrices(houses, 7)
 
-            if not check_feature_exists('bedrooms', house):
-                continue #skip iteration
-            current_house.bedrooms = house['bedrooms']
+	# Scale feature data a bit (doesn't seem to help much)
+	X = preprocessing.scale(X) 
 
-            if not check_feature_exists('bathrooms', house):
-                continue #skip iteration
-            current_house.bathrooms = house['bathrooms']
+	n_splits = 5
+	
+	print("Support Vector Regression with " + str(n_splits) + "-fold cross-validation")
+	classify(X, y, n_splits, svm.SVR())  
 
-            if not check_feature_exists('landSize', house):
-                continue #skip iteration
-            current_house.land_size = house['landSize']
+	print("Bayesian Ridge Regression with " + str(n_splits) + "-fold cross-validation")
+	classify(X, y, n_splits, BayesianRidge())
 
-            if not check_feature_exists('landSize', house):
-                continue #skip iteration
-            current_house.land_size = house['landSize']
+	print("Logistic Regression with " + str(n_splits) + "-fold cross-validation, liblinear solver")
+	classify(X, y, n_splits, LogisticRegression(solver="liblinear"))
+	
+	print("Logistic Regression with " + str(n_splits) + "-fold cross-validation, newton-cg solver")
+	classify(X, y, n_splits, LogisticRegression(solver="newton-cg"))
+	
+	print("Logistic Regression with " + str(n_splits) + "-fold cross-validation, lbfgs solver")
+	classify(X, y, n_splits, LogisticRegression(solver="lbfgs"))
+	
+	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, squared loss")
+	classify(X, y, n_splits, SGDRegressor(loss="squared_loss"))
 
-            if not check_feature_exists('space', house):
-                continue #skip iteration
-            current_house.square_footage = house['space']
+	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, huber loss")
+	classify(X, y, n_splits, SGDRegressor(loss="huber"))
+	
+	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, epsilon insensitive loss")
+	classify(X, y, n_splits, SGDRegressor(loss="epsilon_insensitive"))
 
-            if not check_feature_exists('ageofBuilding', house):
-                continue #skip iteration
-            current_house.building_age = house['ageofBuilding']
-
-            if not check_feature_exists('rooms', house):
-                continue #skip iteration
-            if house['rooms'] == 0:
-                continue #skip iteration
-            current_house.rooms = house['rooms']
-
-            if not check_nested_feature_exists('average', 'age', house):
-                continue #skip iteration
-            current_house.average_age_area = house['average']['age']
-
-            house_list.append(current_house)
-
-        print "Total house objects:", len(house_list)
-
-
+	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, squared epsilon insensitive loss")
+	classify(X, y, n_splits, SGDRegressor(loss="squared_epsilon_insensitive"))
+	
+	print("Perceptron with " + str(n_splits) + "-fold cross-validation")
+	classify(X, y, n_splits, Perceptron())
+	
+	print("Passive-Aggressive Regressor with " + str(n_splits) + "-fold cross-validation")
+	classify(X, y, n_splits, PassiveAggressiveRegressor())
+	
+	print("RANSAC Regressor with " + str(n_splits) + "-fold cross-validation")
+	classify(X, y, n_splits, RANSACRegressor())
+	
+	print("Theil-Sen Regressor with " + str(n_splits) + "-fold cross-validation")
+	classify(X, y, n_splits, TheilSenRegressor())
 
 if __name__ == "__main__":
-    main()
+	main()
