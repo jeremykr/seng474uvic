@@ -43,15 +43,16 @@ def classify(X, y, k, clf):
 	print("")
 
 def main():
-	houses = Utils.get_house_data('../RemaxScrape/remaxDataset2.json')
+	houses = Utils.get_house_data('../RemaxScrape/remaxDataset2.json', region="Victoria")
+	houses += Utils.get_house_data("../RemaxScrape/remaxVanDataset.json", region="Vancouver")
 	print("Total listings: " + str(len(houses)) + "\n")
-	X, y = Utils.create_matrices(houses, 7)
+	X, y = Utils.create_matrices(houses, 10)
 
 	# Scale feature data a bit (doesn't seem to help much)
 	X = preprocessing.scale(X) 
 
 	n_splits = 5
-	
+	'''
 	print("Support Vector Regression with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, svm.SVR())  
 
@@ -84,12 +85,12 @@ def main():
 	
 	print("Passive-Aggressive Regressor with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, PassiveAggressiveRegressor())
-	
+	'''
 	print("RANSAC Regressor with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, RANSACRegressor())
-	
+	'''
 	print("Theil-Sen Regressor with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, TheilSenRegressor())
-
+	'''
 if __name__ == "__main__":
 	main()
