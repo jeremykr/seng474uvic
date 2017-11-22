@@ -47,9 +47,11 @@ class Utils:
 
 				if not check_feature_exists('landSize', house):
 					continue #skip iteration
+				current_house.land_size = house['landSize']
 
 				if not check_feature_exists('space', house):
 					continue #skip iteration
+				current_house.square_footage = house['space']
 
 				#Normalize expected living space/lot size where possible
 				if house['space'] == 0:

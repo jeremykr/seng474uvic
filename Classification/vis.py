@@ -5,23 +5,37 @@ from scipy.interpolate import spline
 from scipy.stats import pearsonr
 from utils import Utils
 
-houses = Utils.get_house_data("../RemaxScrape/remaxVanDataset.json")
-print(len(houses))
+#houses = Utils.get_house_data("../RemaxScrape/remaxVanDataset.json", "Vancouver")
+houses = Utils.get_house_data("../RemaxScrape/remaxDataset2.json", "Victoria")
 
-# Do stuff here
+houses.sort(key=lambda h: h.price, reverse=True)
 
-#for i in range(len(houses[0])):
-#    pearson_scores.append([attribs[i]] + list(pearsonr(prices, [h[i] for h in houses])))
+prices = [h.price for h in houses]
+spaces = [h.square_footage for h in houses]
+bedrooms = [h.bedrooms for h in houses]
+bathrooms = [h.bathrooms for h in houses]
+landSizes = [h.land_size for h in houses]
+walkScores = [h.walk_score for h in houses]
+avgLocalPrices = [h.average_local_price for h in houses]
+random = [np.random.random() for _ in houses]
 
-# Sort pearson scores by absolute value of score * 1 - p-value
-'''
-pearson_scores.sort(key=lambda s: abs(s[1] * (1 - s[2])), reverse=True)
-pearson_scores = [["=========", "=============", "======="]] + pearson_scores[:]
-pearson_scores = [["Attribute", "Pearson Score", "P-value"]] + pearson_scores[:]
+attributes = {"price" : prices, "space" : spaces, "bedrooms": bedrooms, \
+                "bathrooms": bathrooms, "land size": landSizes, "random": random, \
+                "walk score": walkScores, "avg local price": avgLocalPrices}
+
+pearson_scores = {}
+for key in attributes:
+    pearson_scores[key] = pearsonr(attributes["price"], attributes[key])
+
+pearson_scores = [(k, pearson_scores[k]) for k in pearson_scores]
+pearson_scores.sort(key=lambda t: abs(t[1][0] * (1 - t[1][1])), reverse=True)
+
+spacing = 20
+
 for s in pearson_scores:
-    padding1 = 20 - len(s[0])
-    print(s[0] + " " * padding1, end='')
-    padding2 = 20 - len(str(s[1]))
-    print(str(s[1]) + " " * padding2, end='')
-    print(s[2])
-'''
+    attrib = s[0]
+    score = str(s[1][0])
+    pval = str(s[1][1])
+    print(attrib + " " * (spacing - len(attrib)), end="")
+    print(score + " " * (spacing - len(score)), end="")
+    print(pval + " " * (spacing - len(pval)))
