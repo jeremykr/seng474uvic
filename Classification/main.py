@@ -6,6 +6,9 @@ from sklearn import svm
 from sklearn import preprocessing
 from sklearn.linear_model import BayesianRidge, LogisticRegression, SGDRegressor, Perceptron, PassiveAggressiveRegressor, RANSACRegressor, TheilSenRegressor
 from sklearn.ensemble import RandomForestRegressor
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+
 
 # Train and test using the given classifier with k-fold cross-validation
 def classify(X, y, k, clf):
@@ -46,6 +49,37 @@ def classify(X, y, k, clf):
 	print("Mean R2 scores: " + str(round(r2_scores/k, 2)))
 	print("")
 
+	#Note: plots only last split of data (~650 instances for Vic+Van data)
+	dif_plot(y_test, y_pred)
+
+def dif_plot(y_test, y_pred):
+	plt.rcParams['legend.numpoints'] = 2
+
+	fig, ax = plt.subplots(figsize=(12,8))
+
+	for i in range(len(y_pred)):
+		plt.plot([i, i], [y_pred[i], y_test[i]], c='k', lw=0.5)
+
+	ax.plot(y_pred, 'o', label='Prediction', color='g')
+	ax.plot(y_test, '^', label='Ground Truth', color='r')
+
+	ax.set_xlim((-1, len(y_pred)))
+	
+	ax.set_yscale('log')
+	ax.set_yticks([100000, 200000, 500000, 1000000, 2500000, 5000000, 10000000, 20000000, 30000000])
+	ax.get_yaxis().set_major_formatter(ticker.ScalarFormatter())
+
+
+	plt.xlabel('Property Index (i)')
+	plt.ylabel('Property Price (dollars)')
+	plt.title('Random Forest Regressor: Ground Truth vs Predicted Property Price')
+
+	plt.legend(loc="upper right")
+
+	#For saving a subplot
+	fig.savefig('./random_forest_graph.png')
+	plt.show()
+
 def main():
 	houses = Utils.get_house_data('../RemaxScrape/remaxDataset2.json', region="Victoria")
 	houses += Utils.get_house_data("../RemaxScrape/remaxVanDataset.json", region="Vancouver")
@@ -57,12 +91,13 @@ def main():
 
 	n_splits = 5
 	
+	'''
 	print("Support Vector Regression with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, svm.SVR())  
 
 	print("Bayesian Ridge Regression with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, BayesianRidge())
-	'''
+	#
 	print("Logistic Regression with " + str(n_splits) + "-fold cross-validation, liblinear solver")
 	classify(X, y, n_splits, LogisticRegression(solver="liblinear"))
 	
@@ -71,10 +106,10 @@ def main():
 	
 	print("Logistic Regression with " + str(n_splits) + "-fold cross-validation, lbfgs solver")
 	classify(X, y, n_splits, LogisticRegression(solver="lbfgs"))
-	'''
+	
 	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, squared loss")
 	classify(X, y, n_splits, SGDRegressor(loss="squared_loss"))
-	'''
+	
 	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, huber loss")
 	classify(X, y, n_splits, SGDRegressor(loss="huber"))
 	
@@ -83,7 +118,7 @@ def main():
 
 	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, squared epsilon insensitive loss")
 	classify(X, y, n_splits, SGDRegressor(loss="squared_epsilon_insensitive"))
-	'''
+	
 	print("Perceptron with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, Perceptron())
 	
@@ -95,7 +130,7 @@ def main():
 	
 	#print("Theil-Sen Regressor with " + str(n_splits) + "-fold cross-validation")
 	#classify(X, y, n_splits, TheilSenRegressor())
-	
+	'''
 	print("Random Forest Regressor with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, RandomForestRegressor())
 	
