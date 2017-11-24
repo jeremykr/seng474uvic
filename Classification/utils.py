@@ -84,7 +84,7 @@ class Utils:
 				current_house.postal_code_prefix_mapping = mapping
 
 				'''
-
+				
 				if check_feature_exists("averageLocalPrice", house):
 					alp = house["averageLocalPrice"]
 					thousands = False
@@ -97,7 +97,7 @@ class Utils:
 					if thousands: alp *= 1000
 					current_house.average_local_price = alp
 				else: continue
-
+				
 				if check_feature_exists("waterfront", house):
 					if house["waterfront"] == "Waterfront":
 						current_house.waterfront = 1

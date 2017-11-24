@@ -5,6 +5,7 @@ from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn import svm
 from sklearn import preprocessing
 from sklearn.linear_model import BayesianRidge, LogisticRegression, SGDRegressor, Perceptron, PassiveAggressiveRegressor, RANSACRegressor, TheilSenRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 # Train and test using the given classifier with k-fold cross-validation
 def classify(X, y, k, clf):
@@ -46,8 +47,8 @@ def classify(X, y, k, clf):
 	print("")
 
 def main():
-	#houses = Utils.get_house_data('../RemaxScrape/remaxDataset2.json', region="Victoria")
-	houses = Utils.get_house_data("../RemaxScrape/remaxVanDataset.json", region="Vancouver")
+	houses = Utils.get_house_data('../RemaxScrape/remaxDataset2.json', region="Victoria")
+	houses += Utils.get_house_data("../RemaxScrape/remaxVanDataset.json", region="Vancouver")
 	print("Total listings: " + str(len(houses)) + "\n")
 	X, y = Utils.create_matrices(houses, 10)
 
@@ -61,10 +62,10 @@ def main():
 
 	print("Bayesian Ridge Regression with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, BayesianRidge())
-
+	'''
 	print("Logistic Regression with " + str(n_splits) + "-fold cross-validation, liblinear solver")
 	classify(X, y, n_splits, LogisticRegression(solver="liblinear"))
-	'''
+	
 	print("Logistic Regression with " + str(n_splits) + "-fold cross-validation, newton-cg solver")
 	classify(X, y, n_splits, LogisticRegression(solver="newton-cg"))
 	
@@ -73,7 +74,7 @@ def main():
 	'''
 	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, squared loss")
 	classify(X, y, n_splits, SGDRegressor(loss="squared_loss"))
-
+	'''
 	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, huber loss")
 	classify(X, y, n_splits, SGDRegressor(loss="huber"))
 	
@@ -82,18 +83,21 @@ def main():
 
 	print("Stochastic Gradient Descent Regressor with " + str(n_splits) + "-fold cross-validation, squared epsilon insensitive loss")
 	classify(X, y, n_splits, SGDRegressor(loss="squared_epsilon_insensitive"))
-	
+	'''
 	print("Perceptron with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, Perceptron())
 	
-	print("Passive-Aggressive Regressor with " + str(n_splits) + "-fold cross-validation")
-	classify(X, y, n_splits, PassiveAggressiveRegressor())
+	#print("Passive-Aggressive Regressor with " + str(n_splits) + "-fold cross-validation")
+	#classify(X, y, n_splits, PassiveAggressiveRegressor())
 	
 	print("RANSAC Regressor with " + str(n_splits) + "-fold cross-validation")
 	classify(X, y, n_splits, RANSACRegressor())
 	
-	print("Theil-Sen Regressor with " + str(n_splits) + "-fold cross-validation")
-	classify(X, y, n_splits, TheilSenRegressor())
+	#print("Theil-Sen Regressor with " + str(n_splits) + "-fold cross-validation")
+	#classify(X, y, n_splits, TheilSenRegressor())
+	
+	print("Random Forest Regressor with " + str(n_splits) + "-fold cross-validation")
+	classify(X, y, n_splits, RandomForestRegressor())
 	
 if __name__ == "__main__":
 	main()
